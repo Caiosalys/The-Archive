@@ -92,60 +92,60 @@
     </footer>
 
     <script>
-        // Selecionar elementos do DOM
+      
         const modal = document.getElementById('itemModal');
         const closeModalBtn = document.getElementById('closeModal');
         const itemCards = document.querySelectorAll('.item-card');
 
-        // Elementos dentro do modal para preencher
+        
         const modalImg = document.getElementById('modalImg');
         const modalTitle = document.getElementById('modalTitle');
         const modalDesc = document.getElementById('modalDesc');
         const modalTag = document.getElementById('modalTag');
 
-        // Função para abrir o modal
+       
         function openModal(card) {
-            // Pegar dados dos atributos do card clicado
+            
             const title = card.getAttribute('data-title');
             const desc = card.getAttribute('data-desc');
             const imgSrc = card.getAttribute('data-image');
             const tagText = card.querySelector('.tag').innerText;
 
-            // Preencher o modal com os dados
+           
             modalTitle.innerText = title;
             modalDesc.innerText = desc;
             modalImg.src = imgSrc;
             modalTag.innerText = tagText;
 
-            // Mostrar o modal
+           
             modal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Impede rolagem da página de fundo
+            document.body.style.overflow = 'hidden'; 
         }
 
-        // Função para fechar o modal
+        
         function closeModal() {
             modal.classList.remove('active');
-            document.body.style.overflow = 'auto'; // Reativa a rolagem
+            document.body.style.overflow = 'auto';
         }
 
-        // Adicionar evento de clique a todos os cards
+       
         itemCards.forEach(card => {
             card.addEventListener('click', () => {
                 openModal(card);
             });
         });
 
-        // Fechar ao clicar no X
+
         closeModalBtn.addEventListener('click', closeModal);
 
-        // Fechar ao clicar fora do conteúdo do modal (no fundo escuro)
+        
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 closeModal();
             }
         });
 
-        // Fechar com a tecla ESC
+       
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && modal.classList.contains('active')) {
                 closeModal();
