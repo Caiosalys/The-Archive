@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Archive | Coleção de Infinitos</title>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.5);
+            --dark: #0a0a0a;
+            --dark-modal: #141414;
+            --light: #e0e0e0;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+
+        /* Fundo Animado */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+        }
+
+        /* Header */
+        header {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-bottom: 1px solid var(--glass);
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            width: 200px;
+            height: 2px;
+            background: var(--gold);
+            box-shadow: 0 0 20px var(--gold);
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            opacity: 0.8;
+        }
+
+        /* Grid da Coleção */
+        .main-content {
+            padding: 80px 10%;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+        }
+
+        /* Card do Item */
+        .item-card {
+            background: var(--glass);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-card::before {
+            content: 'VER DETALHES';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, var(--dark) 0%, transparent 100%);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 30px;
+            opacity: 0;
+            transition: 0.4s;
+            font-weight: bold;
+            color: var(--gold);
+            letter-spacing: 2px;
+            z-index: 2;
+        }
+
+        .item-card:hover::before {
+            opacity: 1;
+        }
+
+        .item-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.3);
+        }
+
+        .item-card h3 {
+            color: var(--gold);
+            margin: 15px 0;
+            font-size: 1.5rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .card-preview-desc {
+            line-height: 1.6;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* MODAL (Aba de Detalhes) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none; /* Oculto por padrão */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1a1a1a, var(--dark-modal));
+            width: 100%;
+            max-width: 900px;
+            border-radius: 20px;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 50px var(--gold-glow);
+            overflow: hidden;
+            position: relative;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2rem;
+            color: var(--gold);
+            cursor: pointer;
+            z-index: 10;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+            text-shadow: 0 0 10px var(--gold);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .modal-image-container {
+            flex: 1 1 400px;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+            border-right: 1px solid var(--gold-glow);
+        }
+
+        .modal-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Filtros para dar um aspecto mais "sci-fi" e misterioso às fotos reais */
+            filter: contrast(1.1) saturate(1.2) brightness(0.9);
+            transition: 0.5s;
+        }
+        
+        .modal-image-container:hover img {
+             transform: scale(1.05);
+        }
+
+        .modal-info {
+            flex: 1 1 400px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .modal-info h2 {
+            color: var(--gold);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .modal-info p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #ddd;
+            margin-bottom: 30px;
+        }
+
+        .acquisition-data {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: var(--gold);
+            opacity: 0.7;
+            border-top: 1px solid var(--glass);
+            padding-top: 20px;
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--glass);
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars"></div>
+
+    <header>
+        <h1>THE ARCHIVE</h1>
+        <p class="subtitle">A Coleção Definitiva do Multiverso.</p>
+    </header>
+
+    <div class="main-content">
+        <h2 class="section-title">Acervo Atual</h2>
+        <main class="collection-grid">
+            
+            <div class="item-card" 
+                 data-title="O Último Suspiro de uma Estrela"
+                 data-desc="Capturado milissegundos antes do colapso total, este frasco de contenção magnética de classe-Z armazena a energia luminosa pura de uma supernova. A luz azul pulsante no centro não é eletricidade, é a "alma" de um sistema solar que não existe mais, suspensa no tempo. Requer 1.2 Gigawatts para manter o campo de contenção estável."
+                 data-image="">
+                <span class="tag">Astronomia</span>
+                <h3>Núcleo de Supernova Contido</h3>
+                <p class="card-preview-desc">Energia estelar pura capturada em um frasco de vácuo quântico.</p>
+            </div>
+
+            <div class="item-card"
+                 data-title="A Biblioteca de Alexandria (Cristalizada)"
+                 data-desc="Não são apenas textos digitalizados. Utilizando tecnologia de recuperação temporal, a essência física de cada pergaminho perdido foi reconstruída e fundida em estruturas de dados cristalinos. Ao tocar o cristal, o conhecimento flui diretamente para a mente do usuário. Contém sabedoria que reescreveria a história humana se liberada."
+                 data-image="">
+                <span class="tag">História Recuperada</span>
+                <h3>A Biblioteca de Alexandria</h3>
+                <p class="card-preview-desc">O conhecimento total do mundo antigo, salvo do incêndio em cristais de memória.</p>
+            </div>
+
+            <div class="item-card"
+                 data-title="Uma Grama de Antimatéria"
+                 data-desc="O item mais volátil da coleção. Esta única grama de antúrio está suspensa em um vácuo perfeito dentro de uma câmara Penning-Ioffe de ouro maciço e titânio. Se o campo falhar e ela tocar a matéria comum, a liberação de energia seria equivalente a uma ogiva termonuclear de 43 megatons. Uma beleza terrível."
+                 data-image="">
+                <span class="tag">Física</span>
+                <h3>Câmara de Antimatéria</h3>
+                <p class="card-preview-desc">Suspensão magnética perfeita. O objeto mais caro (e perigoso) já criado.</p>
+            </div>
+
+            <div class="item-card"
+                 data-title="O Fragmento do Éden"
+                 data-desc="Recuperado de coordenadas que não constam em nenhum mapa terrestre. Esta estrutura biológica luminescente desafia a classificação botânica conhecida. Ela não realiza fotossíntese, mas sim absorve 'intenções' do ambiente. Diz-se que estar na presença dela cura doenças degenerativas, mas causa alucinações vívidas de um jardim primordial."
+                 data-image="">
+                <span class="tag">botânica</span>
+                <h3>A Flor do Tempo</h3>
+                <p class="card-preview-desc">Uma planta que floresce a cada 500 anos, suas pétalas reagem à consciência do observador.</p>
+            </div>
+
+             <div class="item-card"
+                data-title="Relíquia da Atlântida: O Motor Poseidon"
+                data-desc="Recuperado a 12.000 metros de profundidade no Atlântico. Esta não é uma maquete, é o mecanismo central que energizava a cidade perdida. Feito de um 'coral metálico' vivo que conduz eletricidade com eficiência supercondutora. Ele ainda pulsa com uma leve energia geotérmica, aguardando ser reativado."
+                data-image="https://images.unsplash.com/photo-1560264357-8d9202250f21?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3">
+               <span class="tag">Arqueologia Abissal</span>
+               <h3>O Motor de Atlântida</h3>
+               <p class="card-preview-desc">Artefato recuperado de explorações submarinas secretas. Feito de coral vivo e metal.</p>
+           </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="itemModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeModal">&times;</span>
+            <div class="modal-body">
+                <div class="modal-image-container">
+                    <img id="modalImg" src="" alt="Artefato">
+                </div>
+                <div class="modal-info">
+                    <span class="tag" id="modalTag">Tag do Item</span>
+                    <h2 id="modalTitle">Título do Item</h2>
+                    <p id="modalDesc">Descrição completa do item aqui.</p>
+                    <div class="acquisition-data">
+                        STATUS: CONTIDO<br>
+                        NÍVEL DE ACESSO: ÔMEGA<br>
+                        ID ARQUIVO: #X7-992B
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2049 The Archive Corporation. A realidade é apenas mais um item colecionável.
+    </footer>
+
+    <script>
+        // Selecionar elementos do DOM
+        const modal = document.getElementById('itemModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const itemCards = document.querySelectorAll('.item-card');
+
+        // Elementos dentro do modal para preencher
+        const modalImg = document.getElementById('modalImg');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalTag = document.getElementById('modalTag');
+
+        // Função para abrir o modal
+        function openModal(card) {
+            // Pegar dados dos atributos do card clicado
+            const title = card.getAttribute('data-title');
+            const desc = card.getAttribute('data-desc');
+            const imgSrc = card.getAttribute('data-image');
+            const tagText = card.querySelector('.tag').innerText;
+
+            // Preencher o modal com os dados
+            modalTitle.innerText = title;
+            modalDesc.innerText = desc;
+            modalImg.src = imgSrc;
+            modalTag.innerText = tagText;
+
+            // Mostrar o modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Impede rolagem da página de fundo
+        }
+
+        // Função para fechar o modal
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Reativa a rolagem
+        }
+
+        // Adicionar evento de clique a todos os cards
+        itemCards.forEach(card => {
+            card.addEventListener('click', () => {
+                openModal(card);
+            });
+        });
+
+        // Fechar ao clicar no X
+        closeModalBtn.addEventListener('click', closeModal);
+
+        // Fechar ao clicar fora do conteúdo do modal (no fundo escuro)
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Fechar com a tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+    </script>
+
+</body>
+</html>
